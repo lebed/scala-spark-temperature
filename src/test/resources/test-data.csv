@@ -1,0 +1,6 @@
+state_code,county_code,site_num,parameter_code,poc,latitude,longitude,datum,parameter_name,date_local,time_local,date_gmt,time_gmt,sample_measurement,units_of_measure,mdl,uncertainty,qualifier,method_type,method_code,method_name,state_name,county_name,date_of_last_change
+08,005,0003,62101,1,39.657222,-104.998056,NAD27,Outdoor Temperature,1993-04-13,00:00,1993-04-13,07:00,33.0,Degrees Fahrenheit,-60.0,,,Non-FRM,40,INSTRUMENTAL - ELECTRONIC OR MACHINE AVG.,Colorado,Arapahoe,
+08,005,0003,62101,1,39.657222,-104.998056,NAD27,Outdoor Temperature,1993-04-14,00:00,1993-04-14,07:00,33.0,Degrees Fahrenheit,-60.0,,,Non-FRM,40,INSTRUMENTAL - ELECTRONIC OR MACHINE AVG.,Colorado,Arapahoe,
+09,001,0017,62101,1,41.003611,-73.585,WGS84,Outdoor Temperature,1993-06-04,00:00,1993-06-04,05:00,57.0,Degrees Fahrenheit,-60.0,,,Non-FRM,40,INSTRUMENTAL - ELECTRONIC OR MACHINE AVG.,Connecticut,Fairfield,
+09,001,0017,62101,1,41.003611,-73.585,WGS84,Outdoor Temperature,1993-06-05,00:00,1993-06-05,05:00,54.0,Degrees Fahrenheit,-60.0,,,Non-FRM,40,INSTRUMENTAL - ELECTRONIC OR MACHINE AVG.,Connecticut,Fairfield,
+24,033,8001,62101,1,38.851667,-76.932778,WGS84,Outdoor Temperature,1993-04-27,00:00,1993-04-27,05:00,45.0,Degrees Fahrenheit,-60.0,,,Non-FRM,40,INSTRUMENTAL - ELECTRONIC OR MACHINE AVG.,Maryland,Prince George's,

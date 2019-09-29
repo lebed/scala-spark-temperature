@@ -1,5 +1,7 @@
 package temperature.test.scala
 
+import java.time.LocalDate
+
 import com.github.tototoshi.csv._
 import temperature.test.model.{MeteoRecord, MonthlyAverage}
 
@@ -22,7 +24,30 @@ object Main extends App {
    * @param str - sequence of fields as parsed strings
    * @return a valid instance of MeteoRecord as Some, or None otherwise.
    */
-  def toRecord(str: Seq[String]): Option[MeteoRecord] = ???
+  def toRecord(str: Seq[String]): Option[MeteoRecord] = {
+    try {
+
+      val date = str(11)
+      val latitude = str(5)
+      val longitude = str(6)
+      val measurement = str(13)
+      val stateName = str(21)
+      val countyName = str(22)
+
+      Some(
+        MeteoRecord(
+          LocalDate.parse(date),
+          latitude.toDouble,
+          longitude.toDouble,
+          extractDouble(measurement),
+          stateName,
+          countyName
+        )
+      )
+    } catch {
+      case _: Throwable => None
+    }
+  }
 
   /** Monthly average temperature calculation, sorted in decreasing order of temperature.
    *
