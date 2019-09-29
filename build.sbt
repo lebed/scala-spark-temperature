@@ -9,6 +9,10 @@ lazy val root = (project in file(".")).
     name := "temperature",
     libraryDependencies ++= Seq(
       scalaCsv,
+      sparkSql,
+      sparkCoreTest,
+      sparkSqlTest,
+      sparkCatalystTest,
       scalactic,
       scalaTest
     ),
