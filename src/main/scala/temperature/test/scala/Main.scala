@@ -1,10 +1,8 @@
 package temperature.test.scala
 
 import java.time.LocalDate
-
 import com.github.tototoshi.csv._
-import temperature.test.model.{MeteoRecord, MonthlyAverage}
-
+import temperature.test.scala.model.{MeteoRecord, MonthlyAverage}
 import scala.io.Source
 import scala.util.Try
 
@@ -49,7 +47,7 @@ object Main extends App {
     }
   }
 
-  /** Monthly average temperature calculation, sorted in decreasing order of temperature.
+  /** Monthly average temperature calculation, sorted in decreasing order of avg measurement.
    *
    * @param records iterator of MeteoRecord
    * @return sequence of monthly average temperatures from hottest to coldest.

@@ -3,7 +3,7 @@ package temperature.test.scala
 import java.time.LocalDate
 
 import org.scalatest.FunSpec
-import temperature.test.model.{MeteoRecord, MonthlyAverage}
+import temperature.test.scala.model.{MeteoRecord, MonthlyAverage}
 import Main._
 import com.github.tototoshi.csv.CSVReader
 

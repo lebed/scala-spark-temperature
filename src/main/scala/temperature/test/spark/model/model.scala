@@ -1,18 +1,17 @@
-package temperature.test
+package temperature.test.spark
 
-import java.time.LocalDate
+import java.sql.Date
 
 package object model {
 
   case class MonthlyAverage(month: Int, avg: Double)
 
   case class MeteoRecord(
-    date: LocalDate,
+    date: Date,
     lat: Double,
     lon: Double,
     measurement: Option[Double],
     stateName: String,
     countyName: String
   )
-
 }
