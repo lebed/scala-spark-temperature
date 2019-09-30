@@ -54,7 +54,27 @@ object Main extends App {
    * @param records iterator of MeteoRecord
    * @return sequence of monthly average temperatures from hottest to coldest.
    */
-  def calculateAvgTemperatureByMonth(records: Iterator[MeteoRecord]): Seq[MonthlyAverage] = ???
+  def calculateAvgTemperatureByMonth(records: Iterator[MeteoRecord]): Seq[MonthlyAverage] = {
+    def groupRecordsByMonth(records: Iterator[MeteoRecord]): Map[Int, Seq[MeteoRecord]] = {
+      records.foldLeft(Map.empty[Int, Seq[MeteoRecord]])((acc, curr) =>
+        curr.measurement match {
+          case Some(_) =>
+            acc + (curr.date.getMonthValue -> (acc.getOrElse(curr.date.getMonthValue, Seq.empty[MeteoRecord]) :+ curr))
+          case None => acc
+        }
+      )
+    }
+
+    def countAvgTemperature(groupedRecords: Map[Int, Seq[MeteoRecord]]): Seq[MonthlyAverage] = {
+      groupedRecords.map(x => {
+        val filteredData = x._2.filter(x => x.measurement.isDefined)
+        val averageTemperatures = filteredData.foldLeft(0.0)((x, y) => x + y.measurement.get) / filteredData.length
+        MonthlyAverage(x._1, averageTemperatures)
+      }).toSeq
+    }
+
+    countAvgTemperature(groupRecordsByMonth(records)).sortBy(_.avg)(Ordering[Double].reverse)
+  }
 
   def withRecordsIterator[A](f: Iterator[MeteoRecord] => A): A = {
     val reader = CSVReader.open(Source.fromInputStream(getClass().getClassLoader.getResourceAsStream("temperature.csv")))

@@ -3,9 +3,10 @@ package temperature.test.scala
 import java.time.LocalDate
 
 import org.scalatest.FunSpec
-import temperature.test.model.{MeteoRecord}
+import temperature.test.model.{MeteoRecord, MonthlyAverage}
 import Main._
 import com.github.tototoshi.csv.CSVReader
+
 import scala.io.Source
 
 class MainSuite extends FunSpec {
@@ -114,6 +115,19 @@ class MainSuite extends FunSpec {
         assert(actualResult == expectedResult)
       }
     }
+  }
+
+  it("calculateAvgTemperatureByMonth") {
+    val expectedResult = Array(
+      MonthlyAverage(6, 55.5),
+      MonthlyAverage(4, 37),
+    )
+    val actualResult = withRecordsIterator(calculateAvgTemperatureByMonth)
+
+    assert(actualResult.size == 2)
+    expectedResult.indices.foreach(i => {
+      assert(actualResult(i) == expectedResult(i))
+    })
   }
 
 }
