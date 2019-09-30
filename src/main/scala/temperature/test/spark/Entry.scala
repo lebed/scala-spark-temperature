@@ -58,11 +58,24 @@ object Entry {
         System.lineSeparator() +
         calculateAvgTemperatureByMonth(records).mkString(System.lineSeparator()))
 
-    /** Monthly average temperature calculation, sorted in decreasing order of temperature.
+    /** Monthly average temperature calculation, sorted in decreasing order of avg measurement.
      *
      * @param records meteo records Dataset
      * @return sequence of monthly average temperatures from hottest to coldest.
      */
-    def calculateAvgTemperatureByMonth(records: AnyRef[MeteoRecord]): Seq[MonthlyAverage] = ???
+    def calculateAvgTemperatureByMonth(records: Dataset[MeteoRecord]): Seq[MonthlyAverage] = {
+      import spark.implicits._
+
+      val df = records
+        .withColumn("month", month($"date"))
+        .groupBy("month")
+        .agg(avg("measurement").as("measurementTempByMonth"))
+        .map(x => {
+          MonthlyAverage(x.getAs[Int]("month"), x.getAs[Double]("measurementTempByMonth"))
+        })
+        .orderBy(desc("avg"))
+
+      df.collect().toSeq
+    }
   }
 }
