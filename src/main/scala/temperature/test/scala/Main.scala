@@ -22,6 +22,10 @@ object Main extends App {
     System.lineSeparator() +
     withRecordsIterator(ri => calculateMaxTemperatureByMonthForState(ri, "Michigan")).mkString(System.lineSeparator()))
 
+  println("- The high temperature per month from hottest month to coldest month for 'Baltimore' country:" +
+    System.lineSeparator() +
+    withRecordsIterator(ri => calculateMaxTemperatureByMonthForCountry(ri, "Baltimore")).mkString(System.lineSeparator()))
+
   val endTime = System.nanoTime()
   println("Executed time: " + (endTime - startTime) + "ns")
 
@@ -80,6 +84,30 @@ object Main extends App {
    */
   def calculateMaxTemperatureByMonth(records: Iterator[MeteoRecord]): Seq[MeteoRecord] = {
     RecordService.countMaxTemperature(RecordService.groupRecordsByMonth(records))
+      .sortBy(_.measurement.get)(Ordering[Double].reverse)
+  }
+
+  /** Monthly high temperature calculation for state, sorted in decreasing order of measurement.
+   *
+   * @param records iterator of MeteoRecord
+   * @return sequence of monthly high temperatures from hottest to coldest.
+   */
+  def calculateMaxTemperatureByMonthForState(records: Iterator[MeteoRecord], state: String): Seq[MeteoRecord] = {
+    val filteredRecordByCountry = records.filter(x => x.stateName == state)
+
+    RecordService.countMaxTemperature(RecordService.groupRecordsByMonth(filteredRecordByCountry))
+      .sortBy(_.measurement.get)(Ordering[Double].reverse)
+  }
+
+  /** Monthly high temperature calculation for country, sorted in decreasing order of measurement.
+   *
+   * @param records iterator of MeteoRecord
+   * @return sequence of monthly high temperatures from hottest to coldest.
+   */
+  def calculateMaxTemperatureByMonthForCountry(records: Iterator[MeteoRecord], country: String): Seq[MeteoRecord] = {
+    val filteredRecordByCountry = records.filter(x => x.countyName == country)
+
+    RecordService.countMaxTemperature(RecordService.groupRecordsByMonth(filteredRecordByCountry))
       .sortBy(_.measurement.get)(Ordering[Double].reverse)
   }
   }
