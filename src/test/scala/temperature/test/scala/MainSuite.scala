@@ -177,4 +177,38 @@ class MainSuite extends FunSpec {
       assert(actualResult(i) == expectedResult(i))
     })
   }
+
+  describe("hotDaysCount") {
+    it("hot days above 50") {
+      val threshold = 50
+      val expectedResult = 3
+      val actualResult = withRecordsIterator(ri => hotDaysCount(ri, threshold))
+
+      assert(actualResult == expectedResult)
+    }
+
+    it("hot days above 40") {
+      val threshold = 40
+      val expectedResult = 4
+      val actualResult = withRecordsIterator(ri => hotDaysCount(ri, threshold))
+
+      assert(actualResult == expectedResult)
+    }
+  }
+
+  it("getSeqOfAllAvailableCounties") {
+    val expectedResult = Map(
+      "Colorado" -> Set("Arapahoe"),
+      "Connecticut" -> Set("Fairfield"),
+      "Maryland" -> Set("Prince George's")
+    )
+
+    val actualResult = withRecordsIterator(getSeqOfAllAvailableCounties)
+
+    assert(actualResult.size == 3)
+    expectedResult.foreach(i => {
+      assert(actualResult(i._1) == expectedResult(i._1))
+    })
+  }
+
 }

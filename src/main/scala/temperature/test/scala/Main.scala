@@ -26,6 +26,12 @@ object Main extends App {
     System.lineSeparator() +
     withRecordsIterator(ri => calculateMaxTemperatureByMonthForCountry(ri, "Baltimore")).mkString(System.lineSeparator()))
 
+  println("- How many days were temperatures above 75ºF: " + withRecordsIterator(hotDaysCount(_, 75)))
+
+  println("- Seq of all available countries grouped by state" +
+    System.lineSeparator() +
+    withRecordsIterator(getSeqOfAllAvailableCounties).mkString(System.lineSeparator()))
+
   val endTime = System.nanoTime()
   println("Executed time: " + (endTime - startTime) + "ns")
 
@@ -110,6 +116,31 @@ object Main extends App {
     RecordService.countMaxTemperature(RecordService.groupRecordsByMonth(filteredRecordByCountry))
       .sortBy(_.measurement.get)(Ordering[Double].reverse)
   }
+
+  /** counts how many days the temperature was higher for threshold for all data
+   *
+   * @param records iterator of MeteoRecord
+   * @param threshold threshold temperature
+   * @return count of days with temperature above threshold
+   */
+  def hotDaysCount(records: Iterator[MeteoRecord], threshold: Double): Int = {
+    records.foldLeft(0)((days, curr) =>
+      curr.measurement match {
+        case Some(measurement) if measurement > threshold => days + 1
+        case _ => days
+      }
+    )
+  }
+
+  /** Sequence of all available countries grouped by state.
+   *
+   * @param records iterator of MeteoRecord
+   * @return sequence of monthly high temperatures from hottest to coldest.
+   */
+  def getSeqOfAllAvailableCounties(records: Iterator[MeteoRecord]): Map[String, Set[String]] = {
+    records.foldLeft(Map.empty[String, Set[String]])((acc, curr) =>
+      acc + (curr.stateName -> (acc.getOrElse(curr.stateName, Set.empty[String]) + curr.countyName))
+    )
   }
 
   def withRecordsIterator[A](f: Iterator[MeteoRecord] => A): A = {
