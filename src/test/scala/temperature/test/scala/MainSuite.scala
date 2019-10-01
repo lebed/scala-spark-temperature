@@ -1,13 +1,11 @@
 package temperature.test.scala
 
+import scala.io.Source
 import java.time.LocalDate
-
 import org.scalatest.FunSpec
+import com.github.tototoshi.csv.CSVReader
 import temperature.test.scala.model.{MeteoRecord, MonthlyAverage}
 import Main._
-import com.github.tototoshi.csv.CSVReader
-
-import scala.io.Source
 
 class MainSuite extends FunSpec {
 
@@ -102,7 +100,7 @@ class MainSuite extends FunSpec {
 
     it("Record 5") {
       initResources() { source =>
-        val actualResult = toRecord(source.toSeq(5))
+        val actualResult = toRecord(source.toSeq(6))
         val expectedResult = Some(MeteoRecord(
           LocalDate.of(1993, 4, 27),
           38.851667,
@@ -119,14 +117,97 @@ class MainSuite extends FunSpec {
 
   it("calculateAvgTemperatureByMonth") {
     val expectedResult = Array(
+      MonthlyAverage(7, 58),
       MonthlyAverage(6, 55.5),
       MonthlyAverage(4, 37),
     )
     val actualResult = withRecordsIterator(calculateAvgTemperatureByMonth)
 
+    assert(actualResult.size == 3)
+    expectedResult.indices.foreach(i => {
+      assert(actualResult(i) == expectedResult(i))
+    })
+  }
+
+  it("calculateMaxTemperatureByMonth") {
+    val expectedResult = Array(
+      MeteoRecord(LocalDate.of(1993, 7, 1), 41.003611, -73.585,
+        Some(58.0), "Connecticut", "Fairfield"),
+      MeteoRecord(LocalDate.of(1993, 6, 4), 41.003611, -73.585,
+        Some(57.0), "Connecticut", "Fairfield"),
+      MeteoRecord(LocalDate.of(1993, 4, 27), 38.851667, -76.932778,
+        Some(45.0), "Maryland", "Prince George's")
+    )
+    val actualResult = withRecordsIterator(calculateMaxTemperatureByMonth)
+
+    assert(actualResult.size == 3)
+    expectedResult.indices.foreach(i => {
+      assert(actualResult(i) == expectedResult(i))
+    })
+  }
+
+  it("calculateMaxTemperatureByMonthForState") {
+    val stateName = "Connecticut"
+    val expectedResult = Array(
+      MeteoRecord(LocalDate.of(1993, 7, 1), 41.003611, -73.585,
+        Some(58.0), "Connecticut", "Fairfield"),
+      MeteoRecord(LocalDate.of(1993, 6, 4), 41.003611, -73.585,
+        Some(57.0), "Connecticut", "Fairfield")
+    )
+    val actualResult = withRecordsIterator(ri => calculateMaxTemperatureByMonthForState(ri, stateName))
+
     assert(actualResult.size == 2)
     expectedResult.indices.foreach(i => {
       assert(actualResult(i) == expectedResult(i))
+    })
+  }
+
+  it("calculateMaxTemperatureByMonthForCountry") {
+    val countryName = "Fairfield"
+    val expectedResult = Array(
+      MeteoRecord(LocalDate.of(1993, 7, 1), 41.003611, -73.585,
+        Some(58.0), "Connecticut", "Fairfield"),
+      MeteoRecord(LocalDate.of(1993, 6, 4), 41.003611, -73.585,
+        Some(57.0), "Connecticut", "Fairfield")
+    )
+    val actualResult = withRecordsIterator(ri => calculateMaxTemperatureByMonthForCountry(ri, countryName))
+
+    assert(actualResult.size == 2)
+    expectedResult.indices.foreach(i => {
+      assert(actualResult(i) == expectedResult(i))
+    })
+  }
+
+  describe("hotDaysCount") {
+    it("hot days above 50") {
+      val threshold = 50
+      val expectedResult = 3
+      val actualResult = withRecordsIterator(ri => hotDaysCount(ri, threshold))
+
+      assert(actualResult == expectedResult)
+    }
+
+    it("hot days above 40") {
+      val threshold = 40
+      val expectedResult = 4
+      val actualResult = withRecordsIterator(ri => hotDaysCount(ri, threshold))
+
+      assert(actualResult == expectedResult)
+    }
+  }
+
+  it("getSeqOfAllAvailableCounties") {
+    val expectedResult = Map(
+      "Colorado" -> Set("Arapahoe"),
+      "Connecticut" -> Set("Fairfield"),
+      "Maryland" -> Set("Prince George's")
+    )
+
+    val actualResult = withRecordsIterator(getSeqOfAllAvailableCounties)
+
+    assert(actualResult.size == 3)
+    expectedResult.foreach(i => {
+      assert(actualResult(i._1) == expectedResult(i._1))
     })
   }
 
