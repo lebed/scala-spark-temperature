@@ -128,6 +128,34 @@ class MainSuite extends FunSpec {
       assert(actualResult(i) == expectedResult(i))
     })
   }
+
+  it("calculateMaxTemperatureByMonth") {
+    val expectedResult = Array(
+      MeteoRecord(LocalDate.of(1993, 7, 1), 41.003611, -73.585,
+        Some(58.0), "Connecticut", "Fairfield"),
+      MeteoRecord(LocalDate.of(1993, 6, 4), 41.003611, -73.585,
+        Some(57.0), "Connecticut", "Fairfield"),
+      MeteoRecord(LocalDate.of(1993, 4, 27), 38.851667, -76.932778,
+        Some(45.0), "Maryland", "Prince George's")
+    )
+    val actualResult = withRecordsIterator(calculateMaxTemperatureByMonth)
+
+    assert(actualResult.size == 3)
+    expectedResult.indices.foreach(i => {
+      assert(actualResult(i) == expectedResult(i))
+    })
+  }
+
+  it("calculateMaxTemperatureByMonthForState") {
+    val stateName = "Connecticut"
+    val expectedResult = Array(
+      MeteoRecord(LocalDate.of(1993, 7, 1), 41.003611, -73.585,
+        Some(58.0), "Connecticut", "Fairfield"),
+      MeteoRecord(LocalDate.of(1993, 6, 4), 41.003611, -73.585,
+        Some(57.0), "Connecticut", "Fairfield")
+    )
+    val actualResult = withRecordsIterator(ri => calculateMaxTemperatureByMonthForState(ri, stateName))
+
     assert(actualResult.size == 2)
     expectedResult.indices.foreach(i => {
       assert(actualResult(i) == expectedResult(i))

@@ -1,18 +1,26 @@
 package temperature.test.scala
 
 import java.time.LocalDate
-import com.github.tototoshi.csv._
-import temperature.test.scala.model.{MeteoRecord, MonthlyAverage}
 import scala.io.Source
 import scala.util.Try
+import com.github.tototoshi.csv._
+import temperature.test.scala.model.{MeteoRecord, MonthlyAverage}
 
 object Main extends App {
 
   val startTime = System.nanoTime()
 
-  println("Months from hottest to coldest:" +
+  println("- The avg temperature per month from hottest month to coldest month:" +
     System.lineSeparator() +
     withRecordsIterator(calculateAvgTemperatureByMonth).mkString(System.lineSeparator()))
+
+  println("- The high temperature per month from hottest month to coldest month:" +
+    System.lineSeparator() +
+    withRecordsIterator(calculateMaxTemperatureByMonth).mkString(System.lineSeparator()))
+
+  println("- The high temperature per month from hottest month to coldest month for 'Michigan' state:" +
+    System.lineSeparator() +
+    withRecordsIterator(ri => calculateMaxTemperatureByMonthForState(ri, "Michigan")).mkString(System.lineSeparator()))
 
   val endTime = System.nanoTime()
   println("Executed time: " + (endTime - startTime) + "ns")
@@ -53,16 +61,6 @@ object Main extends App {
    * @return sequence of monthly average temperatures from hottest to coldest.
    */
   def calculateAvgTemperatureByMonth(records: Iterator[MeteoRecord]): Seq[MonthlyAverage] = {
-    def groupRecordsByMonth(records: Iterator[MeteoRecord]): Map[Int, Seq[MeteoRecord]] = {
-      records.foldLeft(Map.empty[Int, Seq[MeteoRecord]])((acc, curr) =>
-        curr.measurement match {
-          case Some(_) =>
-            acc + (curr.date.getMonthValue -> (acc.getOrElse(curr.date.getMonthValue, Seq.empty[MeteoRecord]) :+ curr))
-          case None => acc
-        }
-      )
-    }
-
     def countAvgTemperature(groupedRecords: Map[Int, Seq[MeteoRecord]]): Seq[MonthlyAverage] = {
       groupedRecords.map(x => {
         val filteredData = x._2.filter(x => x.measurement.isDefined)
@@ -71,7 +69,19 @@ object Main extends App {
       }).toSeq
     }
 
-    countAvgTemperature(groupRecordsByMonth(records)).sortBy(_.avg)(Ordering[Double].reverse)
+    countAvgTemperature(RecordService.groupRecordsByMonth(records))
+      .sortBy(_.avg)(Ordering[Double].reverse)
+  }
+
+  /** Monthly high temperature calculation for all data, sorted in decreasing order of measurement.
+   *
+   * @param records iterator of MeteoRecord
+   * @return sequence of monthly high temperatures from hottest to coldest.
+   */
+  def calculateMaxTemperatureByMonth(records: Iterator[MeteoRecord]): Seq[MeteoRecord] = {
+    RecordService.countMaxTemperature(RecordService.groupRecordsByMonth(records))
+      .sortBy(_.measurement.get)(Ordering[Double].reverse)
+  }
   }
 
   def withRecordsIterator[A](f: Iterator[MeteoRecord] => A): A = {
