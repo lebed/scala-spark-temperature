@@ -117,7 +117,7 @@ object Main extends App {
       .sortBy(_.measurement.get)(Ordering[Double].reverse)
   }
 
-  /** counts how many days the temperature was higher for threshold for all data
+  /** Counts how many days the temperature was higher for threshold for all data
    *
    * @param records iterator of MeteoRecord
    * @param threshold threshold temperature
