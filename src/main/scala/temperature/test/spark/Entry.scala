@@ -2,9 +2,9 @@ package temperature.test.spark
 
 import java.sql.Date
 import org.apache.spark.sql.Dataset
-import temperature.test.spark.model.{MeteoRecord, MonthlyAverage}
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
+import temperature.test.spark.model.{MeteoRecord, MonthlyAverage}
 
 object Entry {
 
@@ -19,7 +19,7 @@ object Entry {
     val records: Dataset[MeteoRecord] = {
       import spark.implicits._
 
-      val df = spark
+      spark
         .read
         .options(Map(
           "header" -> "true",
@@ -49,12 +49,10 @@ object Entry {
 
         })
         .as[MeteoRecord]
-
-      df
     }
 
     println(
-      "Months from hottest to coldest:" +
+      "- The high temperature per month from hottest month to coldest month:" +
         System.lineSeparator() +
         calculateAvgTemperatureByMonth(records).mkString(System.lineSeparator()))
 
@@ -62,6 +60,7 @@ object Entry {
       "- The high temperature per month from hottest month to coldest month for 'Michigan' state:" +
         System.lineSeparator() +
         calculateMaxTemperatureByMonth(records).mkString(System.lineSeparator()))
+
 
     /** Monthly average temperature calculation, sorted in decreasing order of avg measurement.
      *
@@ -71,7 +70,7 @@ object Entry {
     def calculateAvgTemperatureByMonth(records: Dataset[MeteoRecord]): Seq[MonthlyAverage] = {
       import spark.implicits._
 
-      val df = records
+      records
         .withColumn("month", month($"date"))
         .groupBy("month")
         .agg(avg("measurement").as("measurementTempByMonth"))
@@ -79,6 +78,9 @@ object Entry {
           MonthlyAverage(x.getAs[Int]("month"), x.getAs[Double]("measurementTempByMonth"))
         })
         .orderBy(desc("avg"))
+        .collect()
+        .toSeq
+    }
 
     /** Monthly high temperature calculation, sorted in decreasing order of measurement.
      *
@@ -103,7 +105,6 @@ object Entry {
         .as[MeteoRecord]
         .collect()
         .toSeq
-      df.collect().toSeq
     }
 
 
