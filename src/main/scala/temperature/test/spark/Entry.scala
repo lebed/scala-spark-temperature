@@ -65,6 +65,10 @@ object Entry {
       System.lineSeparator() +
       calculateMaxTemperatureByMonthForState(records, "Michigan").mkString(System.lineSeparator()))
 
+    println("- The high temperature per month from hottest month to coldest month for 'Baltimore' country:" +
+      System.lineSeparator() +
+      calculateMaxTemperatureByMonthForCountry(records, "Baltimore").mkString(System.lineSeparator()))
+
 
     /** Monthly average temperature calculation, sorted in decreasing order of avg measurement.
      *
@@ -138,5 +142,31 @@ object Entry {
         .collect()
     }
 
+    /** Monthly high temperature calculation for country, sorted in decreasing order of measurement.
+     *
+     * @param records iterator of MeteoRecord
+     * @return sequence of monthly high temperatures from hottest to coldest.
+     */
+    def calculateMaxTemperatureByMonthForCountry(records: Dataset[MeteoRecord], country: String): Seq[MeteoRecord] = {
+      import spark.implicits._
+
+      val groupedRecordsByMonth = records
+        .filter(_.stateName == country)
+        .withColumn("month", month($"date"))
+        .groupBy('month)
+        .agg(max('measurement) as "maxMeasurement")
+
+      records
+        .filter(_.stateName == country)
+        .join(groupedRecordsByMonth,
+          groupedRecordsByMonth.col("maxMeasurement") === records.col("measurement") &&
+            groupedRecordsByMonth.col("month") === month(records.col("date"))
+        )
+        .dropDuplicates()
+        .drop("maxMeasurement", "month")
+        .orderBy(desc("measurement"))
+        .as[MeteoRecord]
+        .collect()
+    }
   }
 }
