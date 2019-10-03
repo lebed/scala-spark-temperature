@@ -71,6 +71,9 @@ object Entry {
 
     println("- How many days were temperatures above 75ºF: " + hotDaysCount(records, 75))
 
+    println("- Seq of all available countries grouped by state" +
+      System.lineSeparator() +
+      getSeqOfAllAvailableCounties(records).mkString(System.lineSeparator()))
 
     /** Monthly average temperature calculation, sorted in decreasing order of avg measurement.
      *
@@ -183,6 +186,22 @@ object Entry {
           case Some(v) if v > threshold => true
           case _ => false
         }).count()
+    }
+
+    /** Sequence of all available countries grouped by state.
+     *
+     * @param records iterator of MeteoRecord
+     * @return sequence of monthly high temperatures from hottest to coldest.
+     */
+    def getSeqOfAllAvailableCounties(records: Dataset[MeteoRecord]): Map[String, Set[String]] = {
+      import spark.implicits._
+
+      records
+        .groupBy('stateName)
+        .agg(collect_list("countyName") as "countyNames")
+        .as[(String, Set[String])]
+        .collect()
+        .toMap
     }
 
   }
