@@ -69,6 +69,8 @@ object Entry {
       System.lineSeparator() +
       calculateMaxTemperatureByMonthForCountry(records, "Baltimore").mkString(System.lineSeparator()))
 
+    println("- How many days were temperatures above 75ºF: " + hotDaysCount(records, 75))
+
 
     /** Monthly average temperature calculation, sorted in decreasing order of avg measurement.
      *
@@ -168,5 +170,20 @@ object Entry {
         .as[MeteoRecord]
         .collect()
     }
+
+    /** Counts how many days the temperature was higher for threshold for all data
+     *
+     * @param records iterator of MeteoRecord
+     * @param threshold threshold temperature
+     * @return count of days with temperature above threshold
+     */
+    def hotDaysCount(records: Dataset[MeteoRecord], threshold: Double): Long = {
+      records
+        .filter(_.measurement match {
+          case Some(v) if v > threshold => true
+          case _ => false
+        }).count()
+    }
+
   }
 }
