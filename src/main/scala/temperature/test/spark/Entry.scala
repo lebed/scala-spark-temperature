@@ -1,6 +1,7 @@
 package temperature.test.spark
 
 import java.sql.Date
+
 import org.apache.spark.sql.Dataset
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
@@ -92,7 +93,6 @@ object Entry {
         })
         .orderBy(desc("avg"))
         .collect()
-        .toSeq
     }
 
     /** Monthly high temperature calculation, sorted in decreasing order of measurement.
@@ -112,12 +112,12 @@ object Entry {
         .join(groupedRecordsByMonth,
           groupedRecordsByMonth.col("maxMeasurement") === records.col("measurement") &&
             groupedRecordsByMonth.col("month") === month(records.col("date"))
-        ).dropDuplicates()
+        )
+        .dropDuplicates()
         .drop("maxMeasurement", "month")
         .orderBy(desc("measurement"))
         .as[MeteoRecord]
         .collect()
-        .toSeq
     }
 
     /** Monthly high temperature calculation for state, sorted in decreasing order of measurement.
