@@ -128,14 +128,14 @@ object Entry {
     def calculateMaxTemperatureByMonthForState(records: Dataset[MeteoRecord], state: String): Seq[MeteoRecord] = {
       import spark.implicits._
 
-      val groupedRecordsByMonth = records
-        .filter(_.stateName == state)
+      val filteredRecords = records.filter(_.stateName == state)
+
+      val groupedRecordsByMonth = filteredRecords
         .withColumn("month", month($"date"))
         .groupBy('month)
         .agg(max('measurement) as "maxMeasurement")
 
-      records
-        .filter(_.stateName == state)
+      filteredRecords
         .join(groupedRecordsByMonth,
           groupedRecordsByMonth.col("maxMeasurement") === records.col("measurement") &&
             groupedRecordsByMonth.col("month") === month(records.col("date"))
@@ -155,14 +155,14 @@ object Entry {
     def calculateMaxTemperatureByMonthForCountry(records: Dataset[MeteoRecord], country: String): Seq[MeteoRecord] = {
       import spark.implicits._
 
-      val groupedRecordsByMonth = records
-        .filter(_.stateName == country)
+      val filteredRecords = records.filter(_.stateName == country)
+
+      val groupedRecordsByMonth = filteredRecords
         .withColumn("month", month($"date"))
         .groupBy('month)
         .agg(max('measurement) as "maxMeasurement")
 
-      records
-        .filter(_.stateName == country)
+      filteredRecords
         .join(groupedRecordsByMonth,
           groupedRecordsByMonth.col("maxMeasurement") === records.col("measurement") &&
             groupedRecordsByMonth.col("month") === month(records.col("date"))

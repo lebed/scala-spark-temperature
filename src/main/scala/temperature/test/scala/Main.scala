@@ -73,7 +73,7 @@ object Main extends App {
   def calculateAvgTemperatureByMonth(records: Iterator[MeteoRecord]): Seq[MonthlyAverage] = {
     def countAvgTemperature(groupedRecords: Map[Int, Seq[MeteoRecord]]): Seq[MonthlyAverage] = {
       groupedRecords.map(x => {
-        val filteredData = x._2.filter(x => x.measurement.isDefined)
+        val filteredData = x._2.filter(_.measurement.isDefined)
         val averageTemperatures = filteredData.foldLeft(0.0)((x, y) => x + y.measurement.get) / filteredData.length
         MonthlyAverage(x._1, averageTemperatures)
       }).toSeq
@@ -89,7 +89,8 @@ object Main extends App {
    * @return sequence of monthly high temperatures from hottest to coldest.
    */
   def calculateMaxTemperatureByMonth(records: Iterator[MeteoRecord]): Seq[MeteoRecord] = {
-    RecordService.countMaxTemperature(RecordService.groupRecordsByMonth(records))
+    RecordService
+      .countMaxTemperature(RecordService.groupRecordsByMonth(records))
       .sortBy(_.measurement.get)(Ordering[Double].reverse)
   }
 
@@ -99,9 +100,10 @@ object Main extends App {
    * @return sequence of monthly high temperatures from hottest to coldest.
    */
   def calculateMaxTemperatureByMonthForState(records: Iterator[MeteoRecord], state: String): Seq[MeteoRecord] = {
-    val filteredRecordByCountry = records.filter(x => x.stateName == state)
+    val filteredRecordByCountry = records.filter(_.stateName == state)
 
-    RecordService.countMaxTemperature(RecordService.groupRecordsByMonth(filteredRecordByCountry))
+    RecordService
+      .countMaxTemperature(RecordService.groupRecordsByMonth(filteredRecordByCountry))
       .sortBy(_.measurement.get)(Ordering[Double].reverse)
   }
 
@@ -111,9 +113,10 @@ object Main extends App {
    * @return sequence of monthly high temperatures from hottest to coldest.
    */
   def calculateMaxTemperatureByMonthForCountry(records: Iterator[MeteoRecord], country: String): Seq[MeteoRecord] = {
-    val filteredRecordByCountry = records.filter(x => x.countyName == country)
+    val filteredRecordByCountry = records.filter(_.countyName == country)
 
-    RecordService.countMaxTemperature(RecordService.groupRecordsByMonth(filteredRecordByCountry))
+    RecordService
+      .countMaxTemperature(RecordService.groupRecordsByMonth(filteredRecordByCountry))
       .sortBy(_.measurement.get)(Ordering[Double].reverse)
   }
 
@@ -124,12 +127,16 @@ object Main extends App {
    * @return count of days with temperature above threshold
    */
   def hotDaysCount(records: Iterator[MeteoRecord], threshold: Double): Int = {
-    records.foldLeft(0)((days, curr) =>
-      curr.measurement match {
-        case Some(measurement) if measurement > threshold => days + 1
-        case _ => days
-      }
-    )
+    records
+      .flatMap(_.measurement)
+      .count(_ > threshold)
+
+//    records.foldLeft(0)((days, curr) =>
+//      curr.measurement match {
+//        case Some(measurement) if measurement > threshold => days + 1
+//        case _ => days
+//      }
+//    )
   }
 
   /** Sequence of all available countries grouped by state.
@@ -138,6 +145,7 @@ object Main extends App {
    * @return sequence of monthly high temperatures from hottest to coldest.
    */
   def getSeqOfAllAvailableCounties(records: Iterator[MeteoRecord]): Map[String, Set[String]] = {
+    // maybe .groupBy(_._1).mapValues(_.map(t => (t._2, t._3)))
     records.foldLeft(Map.empty[String, Set[String]])((acc, curr) =>
       acc + (curr.stateName -> (acc.getOrElse(curr.stateName, Set.empty[String]) + curr.countyName))
     )

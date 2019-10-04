@@ -17,9 +17,17 @@ object RecordService {
 
   def countMaxTemperature(groupedRecords: Map[Int, Seq[MeteoRecord]]): Seq[MeteoRecord] = {
     groupedRecords.values.flatMap(records => {
-      val filteredRecords = records.filter(x => x.measurement.isDefined)
-      val maxMeasurement = filteredRecords.maxBy(_.measurement.get)
-      records.filter(_.measurement.get == maxMeasurement.measurement.get).toSet
+      val maxMeasurement = records
+        .flatMap(_.measurement)
+        .max
+
+      // it's faster than records.filter(_.measurement == Some(maxMeasurement)).toSet
+      records.foldLeft(Set.empty[MeteoRecord])((acc, curr) => {
+        curr.measurement match {
+          case Some(measurement) if measurement == maxMeasurement => acc + curr
+          case _ => acc
+        }
+      })
     }).toSeq
   }
 }
