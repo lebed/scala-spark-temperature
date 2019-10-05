@@ -2,6 +2,8 @@ package temperature.test.scala
 
 import temperature.test.scala.model.MeteoRecord
 
+import scala.util.Try
+
 object RecordService {
   def groupRecordsByMonth(records: Iterator[MeteoRecord]): Map[Int, Seq[MeteoRecord]] = {
     // that's why I don't use cast to Seq and group by for iterator
@@ -30,4 +32,18 @@ object RecordService {
       })
     }).toSeq
   }
+
+  type MeteoRecordFilter = MeteoRecord => Boolean
+  def emptyFilter: MeteoRecordFilter = _ => true
+  def countryFilter: String => MeteoRecordFilter = countryName => record => record.countyName == countryName
+  def stateFilter: String => MeteoRecordFilter = stateName => record => record.stateName == stateName
+
+  def calculateMaxTemperatureByMonthWithFilter(records: Iterator[MeteoRecord], f: MeteoRecord => Boolean): Seq[MeteoRecord] = {
+    val filteredRecord = records.filter(f)
+
+    countMaxTemperature(groupRecordsByMonth(filteredRecord))
+      .sortBy(_.measurement.get)(Ordering[Double].reverse)
+  }
+
+  def extractDouble(x: String): Option[Double] = Try(x.toDouble).toOption
 }
