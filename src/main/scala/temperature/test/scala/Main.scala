@@ -41,8 +41,7 @@ object Main extends App {
    * @return a valid instance of MeteoRecord as Some, or None otherwise.
    */
   def toRecord(str: Seq[String]): Option[MeteoRecord] = {
-    try {
-
+    Try {
       val date = str(11)
       val latitude = str(5)
       val longitude = str(6)
@@ -50,19 +49,15 @@ object Main extends App {
       val stateName = str(21)
       val countyName = str(22)
 
-      Some(
-        MeteoRecord(
-          LocalDate.parse(date),
-          latitude.toDouble,
-          longitude.toDouble,
-          extractDouble(measurement),
-          stateName,
-          countyName
-        )
+      MeteoRecord(
+        LocalDate.parse(date),
+        latitude.toDouble,
+        longitude.toDouble,
+        RecordService.extractDouble(measurement),
+        stateName,
+        countyName
       )
-    } catch {
-      case _: Throwable => None
-    }
+    }.toOption
   }
 
   /** Monthly average temperature calculation, sorted in decreasing order of avg measurement.
