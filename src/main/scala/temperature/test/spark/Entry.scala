@@ -24,7 +24,6 @@ object Entry {
         .read
         .options(Map(
           "header" -> "true",
-          "timestampFormat" -> "yyyy-MM-dd",
           "inferSchema" -> "true"
         ))
         .csv("src/main/resources/temperature.csv")
