@@ -1,7 +1,6 @@
 package temperature.test.spark
 
-import java.sql.Date
-
+import java.sql.{Date, Timestamp}
 import org.apache.spark.sql.Dataset
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
@@ -28,27 +27,22 @@ object Entry {
         ))
         .csv("src/main/resources/temperature.csv")
         .map(field => {
-          // todo should refactor this part of code, maybe possible to immediately map to the model
-          import java.text.SimpleDateFormat
-          val format = new SimpleDateFormat("yyyy-MM-dd")
-          val date = format.parse(field(11).toString)
-          val latitude = field(5).toString
-          val longitude = field(6).toString
-          val measurement = field(13).asInstanceOf[Double]
-          val stateName = field(21).toString
-          val countyName = field(22).toString
+          val longitude = field.getAs[Double]("longitude")
+          val latitude = field.getAs[Double]("latitude")
+          val timestamp = field.getAs[Timestamp]("date_gmt")
+          val measurement = field.getAs[Double]("sample_measurement")
+          val stateName = field.getAs[String]("state_name")
+          val countyName = field.getAs[String]("county_name")
 
-            MeteoRecord(
-              new Date(date.getTime),
-              latitude.toDouble,
-              longitude.toDouble,
-              Some(measurement),
-              stateName,
-              countyName
-            )
-
+          MeteoRecord(
+            new Date(timestamp.getTime),
+            latitude,
+            longitude,
+            Some(measurement),
+            stateName,
+            countyName
+          )
         })
-        .as[MeteoRecord]
     }
 
     println(
