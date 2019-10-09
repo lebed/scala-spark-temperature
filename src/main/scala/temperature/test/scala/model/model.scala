@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 package object model {
 
-  case class MonthlyAverage(month: Int, avg: Double)
+  case class MonthlyMeasurement(month: Int, measurement: Double)
 
   case class MeteoRecord(
     date: LocalDate,
