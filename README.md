@@ -1,8 +1,8 @@
-####Implementing methods for analyzing the climate using meteorological data on scala and apache spark.
+#### Implementing methods for analyzing the climate using meteorological data on scala and apache spark.
 
 The data for this project was taken from Google Public Data sets.
 
-#####The following questions are implemented in this project:
+##### The following questions are implemented in this project:
 
 - What is the min/average/high temperature per month from hottest month to coldest month for all data? :white_check_mark:
 - What is the min/average/high temperature per month for country and state ordered by measurements? :white_check_mark:
