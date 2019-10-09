@@ -1,12 +1,19 @@
 package temperature.test.spark
 
 import java.sql.{Date, Timestamp}
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.Dataset
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import temperature.test.spark.model.{MeteoRecord, MonthlyAverage}
 
 object Entry {
+  val rootLogger = Logger.getRootLogger()
+  rootLogger.setLevel(Level.ERROR)
+
+  Logger.getLogger("org.apache.spark").setLevel(Level.WARN)
+  Logger.getLogger("org.spark-project").setLevel(Level.WARN)
+
 
   def main(args: Array[String]) {
     val spark = SparkSession.builder.appName("Temperature Test")
