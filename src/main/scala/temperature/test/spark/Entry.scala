@@ -21,11 +21,12 @@ object Entry {
       .config("spark.master", "local")
       .getOrCreate()
 
+    import spark.implicits._
+
     /**
      * Dataset of temperature.csv
      */
     val records: Dataset[MeteoRecord] = {
-      import spark.implicits._
 
       spark
         .read
@@ -254,8 +255,6 @@ object Entry {
      * @return map includes keys as a state name and values as country names
      */
     def getSeqOfAllAvailableCounties(records: Dataset[MeteoRecord]): Map[String, Set[String]] = {
-      import spark.implicits._
-
       records
         .groupBy('stateName)
         .agg(collect_list("countyName") as "countyNames")
@@ -275,9 +274,6 @@ object Entry {
         filter: MeteoRecordFilter,
         aggregateColumn: Column
       ): Seq[MonthlyMeasurement] = {
-
-        import spark.implicits._
-
         records
           .filter(filter)
           .withColumn("month", month($"date"))
@@ -295,16 +291,15 @@ object Entry {
         filter: MeteoRecordFilter,
         aggregateColumn: Column
       ): Seq[MeteoRecord] = {
-
-        import spark.implicits._
-
         val filteredRecords = records
           .filter(filter)
+          .cache()
 
         val groupedRecordsByMonth = filteredRecords
           .withColumn("month", month($"date"))
           .groupBy('month)
           .agg(aggregateColumn as "aggregateMeasurement")
+          .cache()
 
         filteredRecords
           .join(groupedRecordsByMonth,
