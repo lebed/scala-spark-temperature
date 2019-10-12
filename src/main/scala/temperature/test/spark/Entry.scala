@@ -5,7 +5,6 @@ import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.Dataset
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
-import org.apache.spark.storage.StorageLevel
 import temperature.test.Messages
 import temperature.test.spark.model.{MeteoRecord, MonthlyMeasurement}
 
