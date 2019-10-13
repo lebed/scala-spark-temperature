@@ -299,7 +299,6 @@ object Entry {
           .withColumn("month", month($"date"))
           .groupBy('month)
           .agg(aggregateColumn as "aggregateMeasurement")
-          .cache()
 
         filteredRecords
           .join(groupedRecordsByMonth,
