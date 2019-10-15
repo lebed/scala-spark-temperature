@@ -246,7 +246,7 @@ object EntrySql {
         .collect()
     }
 
-    /** Find all maximum monthly temperatures.
+    /** Find all records with the maximum temperatures for every month.
      * If there were several days with a maximum temperature in a month, then display everything.
      *
      * @param records meteo records DataFrame
