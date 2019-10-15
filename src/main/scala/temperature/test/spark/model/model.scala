@@ -12,6 +12,6 @@ package object model {
     lon: Double,
     measurement: Option[Double],
     stateName: String,
-    countyName: String
+    countryName: String
   )
 }
