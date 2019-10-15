@@ -1,4 +1,4 @@
-#### Implementing methods for analyzing the climate using meteorological data on scala and apache spark.
+#### Implementing methods for analyzing the climate using meteorological data on scala and apache spark(DS/DF).
 
 The data for this project was taken from Google Public Data sets.
 
