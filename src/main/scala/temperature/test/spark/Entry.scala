@@ -41,7 +41,7 @@ object Entry {
           val timestamp = field.getAs[Timestamp]("date_gmt")
           val measurement = field.getAs[Double]("sample_measurement")
           val stateName = field.getAs[String]("state_name")
-          val countyName = field.getAs[String]("county_name")
+          val countryName = field.getAs[String]("county_name")
 
           MeteoRecord(
             new Date(timestamp.getTime),
@@ -49,7 +49,7 @@ object Entry {
             longitude,
             Some(measurement),
             stateName,
-            countyName
+            countryName
           )
         })
     }
@@ -85,11 +85,8 @@ object Entry {
       calculateMaxTemperatureForCountryByMonth(records, "Baltimore").mkString(System.lineSeparator()))
 
 
-    println(Messages.ALL_MAX_TEMPERATURE_BY_MONTH_FOR_STATE + System.lineSeparator() +
-      findAllMaxTemperatureForStateByMonth(records, "Michigan").mkString(System.lineSeparator()))
-
-    println(Messages.ALL_MAX_TEMPERATURE_BY_MONTH_FOR_COUNTRY + System.lineSeparator() +
-      findAllMaxTemperatureForCountryByMonth(records, "Baltimore").mkString(System.lineSeparator()))
+    println(Messages.ALL_RECORDS_WITH_MAX_TEMPERATURE_FOR_EVERY_MONTH + System.lineSeparator() +
+      findAllRecordWithMaxTemperatureForEveryMonth(records).mkString(System.lineSeparator()))
 
 
     println(Messages.HOT_DAYS + hotDaysCount(records, 75))
@@ -206,33 +203,35 @@ object Entry {
       groupTemperatureWithFilterByMonth(records, filter, aggregateColumn)
     }
 
-    /** Find all maximum monthly temperatures for the state.
-     * If there were several days with a maximum temperature in a month, then get everything.
+    /** Find all records with the maximum temperatures for every month.
+     * If there were several days with a maximum temperature in a month, then display everything.
      *
      * @param records meteo records Dataset
-     * @param state state name String
      * @return sequence of meteo records ordered by temperatures from hottest to coldest
      */
-    def findAllMaxTemperatureForStateByMonth(records: Dataset[MeteoRecord], state: String): Seq[MeteoRecord] = {
-      val filter = stateFilter(state)
+    def findAllRecordWithMaxTemperatureForEveryMonth(records: Dataset[MeteoRecord]): Seq[MeteoRecord] = {
+      val filter = emptyFilter
       val aggregateColumn = max("measurement")
 
-      findAllTemperatureWithFilterByMonth(records, filter, aggregateColumn)
-    }
+      val filteredRecords = records
+        .filter(filter)
+        .cache()
 
-    /**
-     * Find all maximum monthly temperatures for the country.
-     * If there were several days with a maximum temperature in a month, then get everything.
-     *
-     * @param records meteo records Dataset
-     * @param country country name String
-     * @return sequence of meteo records ordered by temperatures from hottest to coldest.
-     */
-    def findAllMaxTemperatureForCountryByMonth(records: Dataset[MeteoRecord], country: String): Seq[MeteoRecord] = {
-      val filter = countryFilter(country)
-      val aggregateColumn = max("measurement")
+      val groupedRecordsByMonth = filteredRecords
+        .withColumn("month", month($"date"))
+        .groupBy('month)
+        .agg(aggregateColumn as "aggregateMeasurement")
 
-      findAllTemperatureWithFilterByMonth(records, filter, aggregateColumn)
+      filteredRecords
+        .join(groupedRecordsByMonth,
+          groupedRecordsByMonth.col("aggregateMeasurement") === records.col("measurement") &&
+            groupedRecordsByMonth.col("month") === month(records.col("date"))
+        )
+        .dropDuplicates()
+        .drop("aggregateMeasurement", "month")
+        .orderBy(desc("measurement"))
+        .as[MeteoRecord]
+        .collect()
     }
 
     /** Counts how many days the temperature was higher for threshold for all data.
@@ -257,7 +256,7 @@ object Entry {
     def getSeqOfAllAvailableCounties(records: Dataset[MeteoRecord]): Map[String, Set[String]] = {
       records
         .groupBy('stateName)
-        .agg(collect_list("countyName") as "countyNames")
+        .agg(collect_list("countryName") as "countryNames")
         .as[(String, Set[String])]
         .collect()
         .toMap
@@ -266,7 +265,7 @@ object Entry {
 
     type MeteoRecordFilter = MeteoRecord => Boolean
     def emptyFilter: MeteoRecordFilter = _ => true
-    def countryFilter: String => MeteoRecordFilter = countryName => record => record.countyName == countryName
+    def countryFilter: String => MeteoRecordFilter = countryName => record => record.countryName == countryName
     def stateFilter: String => MeteoRecordFilter = stateName => record => record.stateName == stateName
 
     def groupTemperatureWithFilterByMonth(
@@ -283,32 +282,6 @@ object Entry {
             MonthlyMeasurement(x.getAs[Int]("month"), x.getAs[Double]("measurementTempByMonth"))
           })
           .orderBy(desc("measurement"))
-          .collect()
-    }
-
-    def findAllTemperatureWithFilterByMonth(
-        records: Dataset[MeteoRecord],
-        filter: MeteoRecordFilter,
-        aggregateColumn: Column
-      ): Seq[MeteoRecord] = {
-        val filteredRecords = records
-          .filter(filter)
-          .cache()
-
-        val groupedRecordsByMonth = filteredRecords
-          .withColumn("month", month($"date"))
-          .groupBy('month)
-          .agg(aggregateColumn as "aggregateMeasurement")
-
-        filteredRecords
-          .join(groupedRecordsByMonth,
-            groupedRecordsByMonth.col("aggregateMeasurement") === records.col("measurement") &&
-              groupedRecordsByMonth.col("month") === month(records.col("date"))
-          )
-          .dropDuplicates()
-          .drop("aggregateMeasurement", "month")
-          .orderBy(desc("measurement"))
-          .as[MeteoRecord]
           .collect()
     }
 

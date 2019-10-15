@@ -32,7 +32,6 @@ object RecordService {
 
   def calculateMaxTemperatureWithFilterByMonth(
       records: Iterator[MeteoRecord],
-      f: MeteoRecord => Boolean,
       aggregate: Seq[Double] => Double
     ): Seq[MeteoRecord] = {
 
@@ -52,8 +51,7 @@ object RecordService {
         .sortBy(_.measurement.get)(Ordering[Double].reverse)
     }
 
-    val filteredRecord = records.filter(f)
-    (groupRecordsByMonth andThen countMaxTemperature)(filteredRecord)
+    (groupRecordsByMonth andThen countMaxTemperature)(records)
   }
 
   val groupRecordsByMonth: Iterator[MeteoRecord] => Map[Int, Seq[MeteoRecord]] = records => {

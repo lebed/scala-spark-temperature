@@ -42,11 +42,8 @@ object Main extends App {
     withRecordsIterator(ri => calculateMaxTemperatureForCountryByMonth(ri, "Baltimore")).mkString(System.lineSeparator()))
 
 
-  println(Messages.ALL_MAX_TEMPERATURE_BY_MONTH_FOR_STATE + System.lineSeparator() +
-    withRecordsIterator(ri => findAllMaxTemperatureForStateByMonth(ri, "Michigan")).mkString(System.lineSeparator()))
-
-  println(Messages.ALL_MAX_TEMPERATURE_BY_MONTH_FOR_COUNTRY + System.lineSeparator() +
-    withRecordsIterator(ri => findAllMaxTemperatureForCountryByMonth(ri, "Baltimore")).mkString(System.lineSeparator()))
+  println(Messages.ALL_RECORDS_WITH_MAX_TEMPERATURE_FOR_EVERY_MONTH + System.lineSeparator() +
+    withRecordsIterator(findAllRecordWithMaxTemperatureForEveryMonth).mkString(System.lineSeparator()))
 
 
   println(Messages.HOT_DAYS + withRecordsIterator(hotDaysCount(_, 75)))
@@ -198,32 +195,17 @@ object Main extends App {
       .calculateTemperatureWithFilterByMonth(records, RecordService.countryFilter(country), aggregate)
   }
 
-  /** Find all the maximum temperatures for the state by month.
+  /** Find all records with the maximum temperatures for every month.
    * If there were several days with a maximum temperature in a month, then get everything.
    *
    * @param records meteo records Dataset
-   * @param state state name String
    * @return sequence of meteo records ordered by temperatures from hottest to coldest
    */
-  def findAllMaxTemperatureForStateByMonth(records: Iterator[MeteoRecord], state: String): Seq[MeteoRecord] = {
+  def findAllRecordWithMaxTemperatureForEveryMonth(records: Iterator[MeteoRecord]): Seq[MeteoRecord] = {
     val aggregate: Seq[Double] => Double = measurements => measurements.max
 
     RecordService
-      .calculateMaxTemperatureWithFilterByMonth(records, RecordService.stateFilter(state), aggregate)
-  }
-
-  /** Find all the maximum temperatures for the country by month.
-   * If there were several days with a maximum temperature in a month, then get everything.
-   *
-   * @param records meteo records Dataset
-   * @param country country name String
-   * @return sequence of meteo records ordered by temperatures from hottest to coldest.
-   */
-  def findAllMaxTemperatureForCountryByMonth(records: Iterator[MeteoRecord], country: String): Seq[MeteoRecord] = {
-    val aggregate: Seq[Double] => Double = measurements => measurements.max
-
-    RecordService
-      .calculateMaxTemperatureWithFilterByMonth(records, RecordService.countryFilter(country), aggregate)
+      .calculateMaxTemperatureWithFilterByMonth(records, aggregate)
   }
 
   /** Counts how many days the temperature was higher for threshold for all data
