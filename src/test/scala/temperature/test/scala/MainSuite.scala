@@ -206,7 +206,7 @@ class MainSuite extends FunSpec {
     )
     val actualResult = withRecordsIterator(ri => findAllRecordWithMaxTemperatureForEveryMonth(ri))
 
-    assert(actualResult.size == 2)
+    assert(actualResult.size == 3)
     expectedResult.indices.foreach(i => {
       assert(actualResult(i) == expectedResult(i))
     })
