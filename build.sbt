@@ -10,9 +10,8 @@ lazy val root = (project in file(".")).
     libraryDependencies ++= Seq(
       scalaCsv,
       sparkSql,
-      sparkCoreTest,
-      sparkSqlTest,
-      sparkCatalystTest,
+      sparkCore,
+      sparkCatalyst,
       scalactic,
       scalaTest
     ),
