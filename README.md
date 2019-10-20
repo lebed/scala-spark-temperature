@@ -16,6 +16,9 @@ The data for this project was taken from Google Public Data sets.
 
 This project requires sbt, JDK 8 and scala 2.12 and spark 2.4.2
 
-| Min temperature | Avg temperature | Max temperature | 
-| -
-| Example 1 <td colspan=1> Example 2 <td colspan=1> Example 3
+| Can Reorder | 2nd operation |2nd operation |2nd operation |
+| :---: | --- |
+|1st operation|Normal Load <br/>Normal Store| Volatile Load <br/>MonitorEnter|Volatile Store<br/> MonitorExit|
+|Normal Load <br/> Normal Store| | | No|
+|Volatile Load <br/> MonitorEnter| No|No|No|
+|Volatile store <br/> MonitorExit| | No|No|
