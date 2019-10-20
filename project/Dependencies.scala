@@ -9,4 +9,6 @@ object Dependencies {
 
   lazy val scalactic = "org.scalactic" %% "scalactic" % "3.0.8"
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.0.5" % Test
+
+  val backendDeps = Seq(scalaCsv, sparkSql, sparkCore, sparkCatalyst, scalactic, scalaTest)
 }
