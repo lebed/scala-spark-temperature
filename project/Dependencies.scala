@@ -5,8 +5,10 @@ object Dependencies {
   lazy val sparkSql = "org.apache.spark" %% "spark-sql" % "2.4.2"
 
   lazy val sparkCore = "org.apache.spark" %% "spark-core" % "2.4.2"
-  lazy val sparkCatalyst = "org.apache.spark" %% "spark-catalyst"
+  lazy val sparkCatalyst = "org.apache.spark" %% "spark-catalyst" % "2.4.2"
 
   lazy val scalactic = "org.scalactic" %% "scalactic" % "3.0.8"
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.0.5" % Test
+
+  val backendDeps = Seq(scalaCsv, sparkSql, sparkCore, sparkCatalyst, scalactic, scalaTest)
 }

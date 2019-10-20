@@ -7,14 +7,7 @@ lazy val root = (project in file(".")).
       version      := "0.1.0-SNAPSHOT"
     )),
     name := "temperature",
-    libraryDependencies ++= Seq(
-      scalaCsv,
-      sparkSql,
-      sparkCore,
-      sparkCatalyst,
-      scalactic,
-      scalaTest
-    ),
+    libraryDependencies ++= backendDeps,
     resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases",
     mainClass in (Compile, run) := Some("temperature.test.scala.Main")
   )
