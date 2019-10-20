@@ -18,6 +18,12 @@ This project requires sbt, JDK 8 and scala 2.12 and spark 2.4.2
 
 Some examples of results:
 * Temperature per month from hottest month to coldest month for all data:
+
 | Min temperature | Avg temperature | Max temperature |
 | :-: | :-: | :-: |
 |![](./images/minForAllData.png)|![](./images/avgForAllData.png)|![](./images/maxForAllData.png)|
+
+
+* All available Countries and States:
+
+![](./images/allAvailableCountries.png)
