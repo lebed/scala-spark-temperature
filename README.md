@@ -15,3 +15,7 @@ The data for this project was taken from Google Public Data sets.
 - Show all available countries grouped by state :white_check_mark:
 
 This project requires sbt, JDK 8 and scala 2.12 and spark 2.4.2
+
+| Min temperature | Avg temperature | Max temperature | 
+| -
+| Example 1 <td colspan=1> Example 2 <td colspan=1> Example 3
