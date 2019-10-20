@@ -1,4 +1,8 @@
-#### Implementing methods for analyzing the climate using meteorological data on scala and apache spark(DS/DF).
+## Weather analyzer
+
+[![Build Status](https://travis-ci.org/lebed/scala-spark-temperature.svg?branch=master)](https://travis-ci.org/lebed/scala-spark-temperature)
+
+#### Implementing methods for analyzing the climate using meteorological data on Scala and Apache Spark(DS/SQL).
 
 The data for this project was taken from Google Public Data sets.
 
@@ -11,3 +15,15 @@ The data for this project was taken from Google Public Data sets.
 - Show all available countries grouped by state :white_check_mark:
 
 This project requires sbt, JDK 8 and scala 2.12 and spark 2.4.2
+
+##### Some examples of results:
+* Temperature per month from hottest month to coldest month for all data:
+
+| Min temperature | Avg temperature | Max temperature |
+| :-: | :-: | :-: |
+|![](./images/minForAllData.png)|![](./images/avgForAllData.png)|![](./images/maxForAllData.png)|
+
+
+* All available Countries and States:
+
+![](./images/allAvailableCountries.png)

@@ -280,10 +280,14 @@ object Entry {
         .groupBy("month")
         .agg(aggregateColumn.as("measurementTempByMonth"))
         .map(x => {
-          MonthlyMeasurement(x.getAs[Int]("month"), x.getAs[Double]("measurementTempByMonth"))
+          MonthlyMeasurement(x.getAs[Int]("month"), round(x.getAs[Double]("measurementTempByMonth")))
         })
         .orderBy(desc("measurement"))
         .collect()
+  }
+
+  def round(d: Double): Double = {
+    BigDecimal(d).setScale(1, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
 
 }
