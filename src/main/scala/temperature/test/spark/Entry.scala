@@ -91,7 +91,7 @@ object Entry {
     println(Messages.HOT_DAYS + hotDaysCount(records, 75))
 
     println(Messages.ALL_AVAILABLE_COUNTRIES + System.lineSeparator() +
-      getSeqOfAllAvailableCounties(records).mkString(System.lineSeparator()))
+      getSeqOfAllAvailableCountries(records).mkString(System.lineSeparator()))
 
   }
 
@@ -254,7 +254,7 @@ object Entry {
    * @param records meteo records Dataset
    * @return map includes keys as a state name and values as country names
    */
-  def getSeqOfAllAvailableCounties(records: Dataset[MeteoRecord]): Map[String, Set[String]] = {
+  def getSeqOfAllAvailableCountries(records: Dataset[MeteoRecord]): Map[String, Set[String]] = {
     records
       .groupBy('stateName)
       .agg(collect_list("countryName") as "countryNames")

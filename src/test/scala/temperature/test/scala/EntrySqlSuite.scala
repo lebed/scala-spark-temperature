@@ -3,12 +3,12 @@ package temperature.test.scala
 import java.sql.{Date, Timestamp}
 import java.time.LocalDate
 
-import org.apache.spark.sql.{Dataset, SparkSession}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.scalatest.FunSpec
-import temperature.test.spark.Entry
+import temperature.test.spark.EntrySql
 import temperature.test.spark.model.{MeteoRecord, MonthlyMeasurement}
 
-class EntrySuite extends FunSpec {
+class EntrySqlSuite extends FunSpec {
 
   val spark = SparkSession
     .builder
@@ -18,7 +18,7 @@ class EntrySuite extends FunSpec {
 
   import spark.implicits._
 
-  val records: Dataset[MeteoRecord] = {
+  val records: DataFrame = {
     spark
       .read
       .options(Map(
@@ -43,7 +43,10 @@ class EntrySuite extends FunSpec {
           countryName
         )
       })
+      .toDF("date", "lat", "lon", "measurement", "stateName", "countryName")
   }
+
+  records.createOrReplaceTempView("records")
 
 
   it("calculateMinTemperatureByMonth") {
@@ -52,7 +55,7 @@ class EntrySuite extends FunSpec {
       MonthlyMeasurement(6, 54.0),
       MonthlyMeasurement(4, 33),
     )
-    val actualResult = Entry.calculateMinTemperatureByMonth(records)
+    val actualResult = EntrySql.calculateMinTemperatureByMonth(records)
 
     assert(actualResult.size == 3)
     expectedResult.indices.foreach(i => {
@@ -66,7 +69,7 @@ class EntrySuite extends FunSpec {
       MonthlyMeasurement(6, 55.5),
       MonthlyMeasurement(4, 37),
     )
-    val actualResult = Entry.calculateAvgTemperatureByMonth(records)
+    val actualResult = EntrySql.calculateAvgTemperatureByMonth(records)
 
     assert(actualResult.size == 3)
     expectedResult.indices.foreach(i => {
@@ -80,7 +83,7 @@ class EntrySuite extends FunSpec {
       MonthlyMeasurement(6, 55.5),
       MonthlyMeasurement(4, 37.0),
     )
-    val actualResult = Entry.calculateAvgTemperatureByMonth(records)
+    val actualResult = EntrySql.calculateAvgTemperatureByMonth(records)
 
     assert(actualResult.size == 3)
     expectedResult.indices.foreach(i => {
@@ -94,7 +97,7 @@ class EntrySuite extends FunSpec {
       MonthlyMeasurement(7,58.0),
       MonthlyMeasurement(6,54.0),
     )
-    val actualResult = Entry.calculateMinTemperatureForStateByMonth(records, stateName)
+    val actualResult = EntrySql.calculateMinTemperatureForStateByMonth(records, stateName)
 
     assert(actualResult.size == 2)
     expectedResult.indices.foreach(i => {
@@ -107,7 +110,7 @@ class EntrySuite extends FunSpec {
     val expectedResult = Array(
       MonthlyMeasurement(7,58.0)
     )
-    val actualResult = Entry.calculateAvgTemperatureForStateByMonth(records, stateName)
+    val actualResult = EntrySql.calculateAvgTemperatureForStateByMonth(records, stateName)
 
     assert(actualResult.size == 2)
     expectedResult.indices.foreach(i => {
@@ -120,7 +123,7 @@ class EntrySuite extends FunSpec {
     val expectedResult = Array(
       MonthlyMeasurement(7,58.0)
     )
-    val actualResult = Entry.calculateMaxTemperatureForStateByMonth(records, stateName)
+    val actualResult = EntrySql.calculateMaxTemperatureForStateByMonth(records, stateName)
 
     assert(actualResult.size == 2)
     expectedResult.indices.foreach(i => {
@@ -135,7 +138,7 @@ class EntrySuite extends FunSpec {
       MeteoRecord(Date.valueOf(LocalDate.of(1993, 6, 4)), 41.003611, -73.585,
         Some(57.0), "Connecticut", "Fairfield")
     )
-    val actualResult = Entry.findAllRecordWithMaxTemperatureForEveryMonth(records)
+    val actualResult = EntrySql.findAllRecordWithMaxTemperatureForEveryMonth(records)
 
     assert(actualResult.size == 3)
     expectedResult.indices.foreach(i => {
@@ -147,7 +150,7 @@ class EntrySuite extends FunSpec {
     it("hot days above 50") {
       val threshold = 50
       val expectedResult = 3
-      val actualResult = Entry.hotDaysCount(records, threshold)
+      val actualResult = EntrySql.hotDaysCount(records, threshold)
 
       assert(actualResult == expectedResult)
     }
@@ -155,7 +158,7 @@ class EntrySuite extends FunSpec {
     it("hot days above 40") {
       val threshold = 40
       val expectedResult = 4
-      val actualResult = Entry.hotDaysCount(records, threshold)
+      val actualResult = EntrySql.hotDaysCount(records, threshold)
 
       assert(actualResult == expectedResult)
     }
@@ -168,7 +171,7 @@ class EntrySuite extends FunSpec {
       "Maryland" -> Set("Prince George's")
     )
 
-    val actualResult = Entry.getSeqOfAllAvailableCountries(records)
+    val actualResult = EntrySql.getSeqOfAllAvailableCountries(records)
 
     assert(actualResult.size == 3)
     expectedResult.foreach(i => {
