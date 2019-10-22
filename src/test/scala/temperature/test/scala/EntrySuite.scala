@@ -168,7 +168,7 @@ class EntrySuite extends FunSpec {
       "Maryland" -> Set("Prince George's")
     )
 
-    val actualResult = Entry.getSeqOfAllAvailableCounties(records)
+    val actualResult = Entry.getSeqOfAllAvailableCountries(records)
 
     assert(actualResult.size == 3)
     expectedResult.foreach(i => {
