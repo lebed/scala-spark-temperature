@@ -254,16 +254,23 @@ object EntrySql {
    * @return sequence of meteo records ordered by temperatures from hottest to coldest
    */
   def findAllRecordWithMaxTemperatureForEveryMonth(records: DataFrame): Seq[MeteoRecord] = {
-    val query = "SELECT DISTINCT r1.date " +
-      ", r1.measurement " +
-      ", r1.lat " +
-      ", r1.lon " +
-      ", r1.stateName " +
-      ", r1.countryName " +
-      "FROM records AS r1 " +
-      "INNER JOIN (SELECT month(date) month, max(measurement) measurement FROM records GROUP BY month(date)) AS r2 " +
-      "ON r1.measurement = r2.measurement AND month(r1.date) = r2.month " +
-      "ORDER BY r1.measurement DESC, r1.date"
+    val query = """
+      SELECT DISTINCT r1.date,
+                      r1.measurement,
+                      r1.lat,
+                      r1.lon,
+                      r1.stateName,
+                      r1.countryName
+      FROM records AS r1
+      INNER JOIN
+        (SELECT month(date) MONTH,
+                max(measurement) AS measurement
+         FROM records
+         GROUP BY month(date)) AS r2
+      ON r1.measurement = r2.measurement AND month(r1.date) = r2.month
+      ORDER BY r1.measurement DESC,
+               r1.date ASC
+      """
 
     spark
       .sql(query)
@@ -292,7 +299,7 @@ object EntrySql {
    * @return map includes keys as a state name and values as country names
    */
   def getSeqOfAllAvailableCountries(records: DataFrame): Map[String, Set[String]] = {
-    val query = s"SELECT stateName, collect_list(countryName) FROM records GROUP BY stateName"
+    val query = s"SELECT stateName, collect_set(countryName) FROM records GROUP BY stateName"
 
     spark
       .sql(query)

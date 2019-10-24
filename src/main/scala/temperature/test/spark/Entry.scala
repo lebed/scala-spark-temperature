@@ -257,7 +257,7 @@ object Entry {
   def getSeqOfAllAvailableCountries(records: Dataset[MeteoRecord]): Map[String, Set[String]] = {
     records
       .groupBy('stateName)
-      .agg(collect_list("countryName") as "countryNames")
+      .agg(collect_set("countryName") as "countryNames")
       .as[(String, Set[String])]
       .collect()
       .toMap
