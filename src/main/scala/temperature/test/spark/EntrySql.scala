@@ -292,7 +292,7 @@ object EntrySql {
    * @return map includes keys as a state name and values as country names
    */
   def getSeqOfAllAvailableCountries(records: DataFrame): Map[String, Set[String]] = {
-    val query = s"SELECT stateName, collect_list(countryName) FROM records GROUP BY stateName"
+    val query = s"SELECT stateName, collect_set(countryName) FROM records GROUP BY stateName"
 
     spark
       .sql(query)
